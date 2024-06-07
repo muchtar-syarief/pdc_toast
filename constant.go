@@ -1,4 +1,4 @@
-package main
+package pdc_toast
 
 type ToastDuration string
 
@@ -79,4 +79,13 @@ type ActionButtonStyle string
 const (
 	SUCCESS  ActionButtonStyle = "Success"
 	CRITICAL ActionButtonStyle = "Critical"
+)
+
+type ScenarioType string
+
+const (
+	URGENT       ScenarioType = "urgent"
+	INCOMINGCALL ScenarioType = "incomingCall"
+	REMAINDER    ScenarioType = "reminder"
+	ALARM        ScenarioType = "alarm"
 )

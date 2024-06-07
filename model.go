@@ -1,4 +1,4 @@
-package main
+package pdc_toast
 
 type Action struct {
 	Label       string

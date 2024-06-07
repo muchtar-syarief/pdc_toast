@@ -1,11 +1,9 @@
-package main
+package pdc_toast
 
 import "text/template"
 
-var toastTemplate *template.Template
-
-func init() {
-	toastTemplate = template.New("toast")
+func ToasTemplate() *template.Template {
+	toastTemplate := template.New("toast")
 	toastTemplate.Parse(`
 [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
 [Windows.UI.Notifications.ToastNotification, Windows.UI.Notifications, ContentType = WindowsRuntime] | Out-Null
@@ -14,29 +12,82 @@ func init() {
 $APP_ID = '{{if .AppID}}{{.AppID}}{{else}}Windows App{{end}}'
 
 $template = @"
-<toast activationType="{{.ActivationType}}" launch="{{.ActivationArguments}}" duration="{{.Duration}}">
+<toast 
+    {{if .Scenario}}
+    scenario="{{ .Scenario }}" 
+    {{end}}
+
+    {{if .ActivationType}}
+    activationType="{{.ActivationType}}" 
+    {{end}}
+
+    {{if .ActivationArguments}}
+    launch="{{.ActivationArguments}}" 
+    {{end}}
+
+    {{if .Duration}}
+    duration="{{.Duration}}" 
+    {{end}}
+
+    {{if .UseButtonStyle}}
+    useButtonStyle='{{ .UseButtonStyle}}'
+    {{end}}
+    >
     <visual>
-        <binding template="ToastGeneric" displayTimestamp="{{ .DisplayTimestamp}}">
-            {{if .Icon}}
-            <image placement="{{ .Icon.Placement }}" hint-crop="{{ .Icon.HintCrop }}" src="{{.Icon.Src}} " />
-            {{end}}
+        <binding template="ToastGeneric">
             {{if .Title}}
             <text><![CDATA[{{.Title}}]]></text>
             {{end}}
+
             {{range .Messages}}
-            <text hint-callScenarioCenterAlign="{{ .AlignCenter }}"><![CDATA[{{.Message}}]]></text>
+            <text 
+            hint-callScenarioCenterAlign="{{ .AlignCenter }}"
+            ><![CDATA[{{.Message}}]]></text>
+            {{end}}
+
+            {{if .Icon}}
+            <image 
+            placement="{{ .Icon.Placement }}" 
+            hint-crop="{{ .Icon.HintCrop }}"
+            src="{{.Icon.Src}} " 
+            />
             {{end}}
         </binding>
     </visual>
     {{if ne .Audio "silent"}}
-	<audio src="{{.Audio}}" loop="{{.Loop}}" />
+	<audio src="{{ .Audio }}" loop="{{ .Loop }}" />
 	{{else}}
 	<audio silent="true" />
 	{{end}}
     {{if .Actions}}
     <actions>
         {{range .Actions}}
-        <action activationType="{{.Type}}" content="{{.Label}}" arguments="{{.Arguments}}" imageUri="{{ .ImageUri }}" hint-buttonStyle="{{ .ButtonStyle }}" hint-toolTip="{{ .Tooltip }}"/>
+        <action 
+
+        {{if .Type}}
+        activationType="{{.Type}}" 
+        {{end}}
+
+        {{if .Label}}
+        content="{{.Label}}" 
+        {{end}}
+
+        {{if .Arguments}}
+        arguments="{{.Arguments}}" 
+        {{end}}
+
+        {{if .ImageUri}}
+        imageUri="{{ .ImageUri }}" 
+        {{end}}
+
+        {{if .ButtonStyle}}
+        hint-buttonStyle="{{ .ButtonStyle }}" 
+        {{end}}
+
+        {{if .Tooltip}}
+        hint-toolTip="{{ .Tooltip }}"
+        {{end}}
+        />
         {{end}}
     </actions>
     {{end}}
@@ -48,15 +99,6 @@ $xml.LoadXml($template)
 $toast = New-Object Windows.UI.Notifications.ToastNotification $xml
 [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($APP_ID).Show($toast)
     `)
-}
 
-// <group>
-//         <subgroup>
-//           <text hint-style="base">52 attendees</text>
-//           <text hint-style="captionSubtle">23 minute drive</text>
-//         </subgroup>
-//         <subgroup>
-//           <text hint-style="captionSubtle" hint-align="right">1 Microsoft Way</text>
-//           <text hint-style="captionSubtle" hint-align="right">Bellevue, WA 98008</text>
-//         </subgroup>
-//       </group>
+	return toastTemplate
+}
