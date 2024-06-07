@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 )
 
 type Notification interface {
@@ -85,7 +85,7 @@ func (n *NotificationImpl) buildXML() (string, error) {
 }
 
 func (n *NotificationImpl) invokeTemporaryScript(content string) error {
-	id, _ := uuid.NewV4()
+	id := uuid.New()
 	file := filepath.Join(os.TempDir(), id.String()+".ps1")
 	defer os.Remove(file)
 
